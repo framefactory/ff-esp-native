@@ -1,11 +1,11 @@
 /**
- * ESP/Arduino GPIO Library
- * Copyright 2020 Frame Factory GmbH, Ralph Wiedemeier
+ * ESP/Native Library
+ * Copyright 2021 Frame Factory GmbH, Ralph Wiedemeier
  * License: MIT
  */
 
 #include "LCDisplay.h"
-#include "driver/uart.h"
+
 
 #include <cstring>
 #include <cstdio>
@@ -15,13 +15,13 @@ F_USE_NAMESPACE
 
 char _buffer[256];
 
-LCDisplay::LCDisplay(int pin, int uart) :
+LCDisplayUART::LCDisplayUART(int pin, uart_port_t uart) :
     _pin(pin),
     _uart(uart)
 {
 }
 
-bool LCDisplay::connect()
+bool LCDisplayUART::connect()
 {
     uart_config_t uart_config = {
         .baud_rate = 9600,
@@ -30,7 +30,7 @@ bool LCDisplay::connect()
         .stop_bits = UART_STOP_BITS_1,
         .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
         .rx_flow_ctrl_thresh = 122,
-        .source_clk = UART_SCLK_APB,
+        .use_ref_tick = false,
     };
 
     ESP_ERROR_CHECK(uart_param_config(_uart, &uart_config));
@@ -40,22 +40,22 @@ bool LCDisplay::connect()
     return true;
 }
 
-bool LCDisplay::disconnect()
+bool LCDisplayUART::disconnect()
 {
     return true;
 }
 
-void LCDisplay::writeBytes(const char* pBytes, size_t length)
+void LCDisplayUART::writeBytes(const char* pBytes, size_t length)
 {
     uart_write_bytes(_uart, pBytes, length);
 }
 
-void LCDisplay::print(const char* pText)
+void LCDisplayUART::print(const char* pText)
 {
     uart_write_bytes(_uart, pText, strlen(pText));
 }
 
-void LCDisplay::printf(const char* pFormat, ...)
+void LCDisplayUART::printf(const char* pFormat, ...)
 {
     va_list argptr;
     va_start(argptr, pFormat);
@@ -63,7 +63,7 @@ void LCDisplay::printf(const char* pFormat, ...)
     uart_write_bytes(_uart, _buffer, strlen(_buffer));
 }
 
-void LCDisplay::printf(int row, int column, const char* pFormat, ...)
+void LCDisplayUART::printf(int row, int column, const char* pFormat, ...)
 {
     setPosition(row, column);
 
@@ -73,13 +73,13 @@ void LCDisplay::printf(int row, int column, const char* pFormat, ...)
     uart_write_bytes(_uart, _buffer, strlen(_buffer));
 }
 
-void LCDisplay::print(const std::string& text)
+void LCDisplayUART::print(const std::string& text)
 {
     const char* pData = text.c_str();
     uart_write_bytes(_uart, pData, text.size());
 }
 
-void LCDisplay::print(int row, int column, const std::string& text)
+void LCDisplayUART::print(int row, int column, const std::string& text)
 {
     setPosition(row, column);
 
@@ -87,38 +87,38 @@ void LCDisplay::print(int row, int column, const std::string& text)
     uart_write_bytes(_uart, pData, text.size());
 }
 
-void LCDisplay::on()
+void LCDisplayUART::on()
 {
     const char pData[] = { 0xFE, 0x0C };
     uart_write_bytes(_uart, pData, 2);
 }
 
-void LCDisplay::off()
+void LCDisplayUART::off()
 {
     const char pData[] = { 0xFE, 0x08 };
     uart_write_bytes(_uart, pData, 2);
 }
 
-void LCDisplay::clear()
+void LCDisplayUART::clear()
 {
     const char pData[] = { 0xFE, 0x01 };
     uart_write_bytes(_uart, pData, 2);
 }
 
-void LCDisplay::setPosition(int row, int column)
+void LCDisplayUART::setPosition(int row, int column)
 {
     char pos = 0x80 + row * 64 + column;
     const char pData[] = { 0xFE, pos };
     uart_write_bytes(_uart, pData, 2);
 }
 
-void LCDisplay::showBlinkingCursor()
+void LCDisplayUART::showBlinkingCursor()
 {
     const char pData[] = { 0xFE, 0x0D };
     uart_write_bytes(_uart, pData, 2);
 }
 
-void LCDisplay::showUnderlineCursor()
+void LCDisplayUART::showUnderlineCursor()
 {
     const char pData[] = { 0xFE, 0x0E };
     uart_write_bytes(_uart, pData, 2);

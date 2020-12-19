@@ -1,22 +1,25 @@
 /**
- * ESP/Arduino GPIO Library
- * Copyright 2020 Frame Factory GmbH, Ralph Wiedemeier
+ * ESP/Native Library
+ * Copyright 2021 Frame Factory GmbH, Ralph Wiedemeier
  * License: MIT
  */
 
-#ifndef _ESP_GPIO_LCDISPLAY_H
-#define _ESP_GPIO_LCDISPLAY_H
+#ifndef _ESP_NATIVE_LCDISPLAY_H
+#define _ESP_NATIVE_LCDISPLAY_H
 
-#include "library.h"
+#include "../library.h"
+#include "driver/uart.h"
+
 #include <string>
+
 
 F_BEGIN_NAMESPACE
 
-class LCDisplay
+class LCDisplayUART
 {
 public:
-    LCDisplay(int pin, int uart = 2);
-    virtual ~LCDisplay() {}
+    LCDisplayUART(int pin, uart_port_t uart = UART_NUM_2);
+    virtual ~LCDisplayUART() {}
 
     bool connect();
     bool disconnect();
@@ -36,9 +39,9 @@ public:
 
 private:
     int _pin;
-    int _uart;
+    uart_port_t _uart;
 };
 
 F_END_NAMESPACE
 
-#endif // _ESP_GPIO_LCDISPLAY_H
+#endif // _ESP_NATIVE_LCDISPLAY_H

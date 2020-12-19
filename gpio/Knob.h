@@ -1,13 +1,13 @@
 /**
- * ESP/Arduino GPIO Library
- * Copyright 2020 Frame Factory GmbH, Ralph Wiedemeier
+ * ESP/Native Library
+ * Copyright 2021 Frame Factory GmbH, Ralph Wiedemeier
  * License: MIT
  */
 
-#ifndef _ESP_GPIO_KNOB_H
-#define _ESP_GPIO_KNOB_H
+#ifndef _ESP_NATIVE_KNOB_H
+#define _ESP_NATIVE_KNOB_H
 
-#include "library.h"
+#include "../library.h"
 
 F_BEGIN_NAMESPACE
 
@@ -30,4 +30,4 @@ private:
 
 F_END_NAMESPACE
 
-#endif // _ESP_GPIO_KNOB_H
+#endif // _ESP_NATIVE_KNOB_H

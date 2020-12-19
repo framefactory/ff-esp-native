@@ -1,11 +1,11 @@
 /**
- * ESP/Arduino GPIO Library
- * Copyright 2020 Frame Factory GmbH, Ralph Wiedemeier
+ * ESP/Native Library
+ * Copyright 2021 Frame Factory GmbH, Ralph Wiedemeier
  * License: MIT
  */
 
-#ifndef _ESP_GPIO_ADC_H
-#define _ESP_GPIO_ADC_H
+#ifndef _ESP_NATIVE_ADC_H
+#define _ESP_NATIVE_ADC_H
 
 #include "library.h"
 
@@ -25,4 +25,4 @@ public:
 
 F_END_NAMESPACE
 
-#endif // _ESP_GPIO_ADC_H
+#endif // _ESP_NATIVE_ADC_H

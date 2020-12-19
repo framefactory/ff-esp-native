@@ -1,6 +1,6 @@
 /**
- * ESP/Arduino GPIO Library
- * Copyright 2020 Frame Factory GmbH, Ralph Wiedemeier
+ * ESP/Native Library
+ * Copyright 2021 Frame Factory GmbH, Ralph Wiedemeier
  * License: MIT
  */
 
@@ -8,7 +8,7 @@
 
 F_USE_NAMESPACE
 
-AnalogInput::AnalogInput(gpio_num_t pin) :
+AnalogInput::AnalogInput(int pin) :
     Pin(pin, GPIO_MODE_INPUT)
 {
 }

@@ -1,6 +1,6 @@
 /**
- * ESP/Arduino GPIO Library
- * Copyright 2020 Frame Factory GmbH, Ralph Wiedemeier
+ * ESP/Native Library
+ * Copyright 2021 Frame Factory GmbH, Ralph Wiedemeier
  * License: MIT
  */
 
@@ -8,7 +8,7 @@
 
 F_USE_NAMESPACE
 
-DigitalInput::DigitalInput(gpio_num_t pin) :
+DigitalInput::DigitalInput(int pin) :
     Pin(pin, GPIO_MODE_INPUT),
     _level(false),
     _interruptType(GPIO_INTR_DISABLE),
@@ -39,7 +39,7 @@ void DigitalInput::enableInterrupt(gpio_int_type_t type, uint64_t usecsDebounce)
     gpio_intr_enable(pin());
 
     _debounceDelay = usecsDebounce;
-    if (usecsDebounce > 0)
+    if (usecsDebounce > 0) {
         esp_timer_init();
 
         esp_timer_create_args_t args1 {
@@ -70,13 +70,13 @@ void DigitalInput::_interruptHandler(void* arg)
 {
     DigitalInput* pPin = static_cast<DigitalInput*>(arg);
 
-    if (pPin->_debounceEnabled) {
+    if (pPin->_debounceDelay > 0) {
         esp_timer_stop(pPin->_debounceTimer);
         esp_timer_start_once(pPin->_debounceTimer, pPin->_debounceDelay);
     }
     else {
-        _level = gpio_get_level(pPin->pin()) > 0;
-        pPin->onChange(_level);
+        pPin->_level = gpio_get_level(pPin->pin()) > 0;
+        pPin->onChange(pPin->_level);
     }
 }
 
@@ -86,6 +86,6 @@ void DigitalInput::_timerHandler(void* arg)
 
     esp_timer_stop(pPin->_debounceTimer);
 
-    _level = gpio_get_level(pPin->pin()) > 0;
-    pPin->onChange(_level);
+    pPin->_level = gpio_get_level(pPin->pin()) > 0;
+    pPin->onChange(pPin->_level);
 }

@@ -1,13 +1,13 @@
 /**
- * ESP/Arduino GPIO Library
- * Copyright 2020 Frame Factory GmbH, Ralph Wiedemeier
+ * ESP/Native Library
+ * Copyright 2021 Frame Factory GmbH, Ralph Wiedemeier
  * License: MIT
  */
 
-#ifndef _ESP_GPIO_ENCODER_H
-#define _ESP_GPIO_ENCODER_H
+#ifndef _ESP_NATIVE_ENCODER_H
+#define _ESP_NATIVE_ENCODER_H
 
-#include "library.h"
+#include "../library.h"
 #include "esp_timer.h"
 
 F_BEGIN_NAMESPACE
@@ -50,4 +50,4 @@ private:
 
 F_END_NAMESPACE
 
-#endif // _ESP_GPIO_ENCODER_H
+#endif // _ESP_NATIVE_ENCODER_H
