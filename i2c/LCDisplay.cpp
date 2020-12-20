@@ -26,11 +26,14 @@ char _printBuffer[128];
 
 LCDisplay::LCDisplay(display_type type /* = Type_1602 */, uint8_t i2cAddress /* = 0x27 */) :
     _type(type),
-    _i2cAddress(i2cAddress)
+    _i2cAddress(i2cAddress),
+    _entryModeFlags(EM_Increment),
+    _displayControlFlags(DC_Display),
+    _backlightEnabled(true)
 {
 }
 
-bool LCDisplay::begin(int sdaPin, int sclPin, int i2cPort /* = 0 */)
+bool LCDisplay::open(int sdaPin, int sclPin, int i2cPort /* = 0 */)
 {
     if (!_port.open(sdaPin, sclPin, i2cPort)) {
         return false;
@@ -38,6 +41,11 @@ bool LCDisplay::begin(int sdaPin, int sclPin, int i2cPort /* = 0 */)
 
     initialize();
     return true;
+}
+
+void LCDisplay::close()
+{
+    _port.close();
 }
 
 void LCDisplay::initialize()
@@ -91,15 +99,35 @@ void LCDisplay::setPosition(uint8_t row, uint8_t col)
     writeRegister(DDRAMAddress | _getAddress(row, col));
 }
 
+void LCDisplay::moveLeft()
+{
+    writeRegister(MoveShift);
+}
+
+void LCDisplay::moveRight()
+{
+    writeRegister(MoveShift | MS_Right);
+}
+
+void LCDisplay::shiftLeft()
+{
+    writeRegister(MoveShift | MS_Shift);
+}
+
+void LCDisplay::shiftRight()
+{
+    writeRegister(MoveShift | MS_Shift | MS_Right);
+}
+
 void LCDisplay::print(const char* pText)
 {
-    writeData((uint8_t*)pText, strlen(pText));
+    writeDisplay((uint8_t*)pText, strlen(pText));
 }
 
 void LCDisplay::print(uint8_t row, uint8_t col, const char* pText)
 {
     setPosition(row, col);
-    writeData((uint8_t*)pText, std::min(columns() - col, strlen(pText)));
+    writeDisplay((uint8_t*)pText, std::min(columns() - col, strlen(pText)));
 }
 
 void LCDisplay::printf(const char* pFormat, ...)
@@ -107,7 +135,7 @@ void LCDisplay::printf(const char* pFormat, ...)
     va_list argptr;
     va_start(argptr, pFormat);
     vsprintf(_printBuffer, pFormat, argptr);
-    writeData((uint8_t*)_printBuffer, strlen(_printBuffer));
+    writeDisplay((uint8_t*)_printBuffer, strlen(_printBuffer));
 }
 
 void LCDisplay::printf(uint8_t row, uint8_t col, const char* pFormat, ...)
@@ -117,31 +145,58 @@ void LCDisplay::printf(uint8_t row, uint8_t col, const char* pFormat, ...)
     va_list argptr;
     va_start(argptr, pFormat);
     vsprintf(_printBuffer, pFormat, argptr);
-    writeData((uint8_t*)_printBuffer, std::min(columns() - col, strlen(_printBuffer)));
+    writeDisplay((uint8_t*)_printBuffer, std::min(columns() - col, strlen(_printBuffer)));
 }
 
-void LCDisplay::setDisplayEnabled(bool enabled)
+void LCDisplay::setEntryDirection(bool state)
 {
-    _displayEnabled = enabled;
-    _writeDisplayControl();
+    _entryModeFlags = state ?
+        _entryModeFlags | EM_Increment :
+        _entryModeFlags & ~EM_Increment;
+
+    writeRegister(EntryMode | _entryModeFlags);
 }
 
-void LCDisplay::setUnderlineCursorEnabled(bool enabled)
+void LCDisplay::enableShift(bool state)
 {
-    _underlineCursor = enabled;
-    _writeDisplayControl();
+    _entryModeFlags = state ?
+        _entryModeFlags | EM_Shift :
+        _entryModeFlags & ~EM_Shift;
+
+    writeRegister(EntryMode | _entryModeFlags);
 }
 
-void LCDisplay::setBlockCursorEnabled(bool enabled)
+void LCDisplay::enableDisplay(bool state)
 {
-    _blockCursor = enabled;
-    _writeDisplayControl();
+    _displayControlFlags = state ?
+        _displayControlFlags | DC_Display :
+        _displayControlFlags & ~DC_Display;
+    
+    writeRegister(DisplayControl | _displayControlFlags);
 }
 
-void LCDisplay::setBacklight(bool state) 
+void LCDisplay::showUnderlineCursor(bool state)
+{
+    _displayControlFlags = state ?
+        _displayControlFlags | DC_Underline :
+        _displayControlFlags & ~DC_Underline;
+    
+    writeRegister(DisplayControl | _displayControlFlags);
+}
+
+void LCDisplay::showBlockCursor(bool state)
+{
+    _displayControlFlags = state ?
+        _displayControlFlags | DC_Block :
+        _displayControlFlags & ~DC_Block;
+    
+    writeRegister(DisplayControl | _displayControlFlags);
+}
+
+void LCDisplay::enableBacklight(bool state) 
 {
     _backlightEnabled = state;
-    _writeDisplayControl();
+    writeRegister(NoOp);
 }
 
 void LCDisplay::writeRegister(uint8_t value)
@@ -159,7 +214,7 @@ void LCDisplay::writeRegister(uint8_t value)
     _port.write(_i2cAddress, buffer, 4);
 }
 
-void LCDisplay::writeData(uint8_t* pData, size_t length)
+void LCDisplay::writeDisplay(uint8_t* pData, size_t length)
 {
     size_t bufSize = length * 4;
     _buffer.resize(bufSize);
@@ -179,6 +234,15 @@ void LCDisplay::writeData(uint8_t* pData, size_t length)
     _port.write(_i2cAddress, _buffer.data(), bufSize);
 }
 
+void LCDisplay::writeCharacter(uint8_t index, uint8_t* pData)
+{
+    if (index < 8) {
+        uint8_t address = index * 8;
+        writeRegister(CGRAMAddress | address);
+        writeDisplay(pData, 8);
+    }
+}
+
 uint8_t LCDisplay::_getAddress(uint8_t row, uint8_t col)
 {
     switch(row) {
@@ -189,14 +253,4 @@ uint8_t LCDisplay::_getAddress(uint8_t row, uint8_t col)
     }
 
     return 0;
-}
-
-void LCDisplay::_writeDisplayControl()
-{
-    uint8_t flags =
-        (_displayEnabled ? DC_Display : 0) |
-        (_underlineCursor ? DC_Cursor : 0) |
-        (_blockCursor ? DC_Blink : 0);
-
-    writeRegister(DisplayControl | flags);
 }
