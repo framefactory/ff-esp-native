@@ -7,7 +7,10 @@
 #ifndef _ESP_NATIVE_LIBRARY_H
 #define _ESP_NATIVE_LIBRARY_H
 
-#include <esp_types.h>
+#include "freertos/FreeRTOS.h"
+#include "esp_log.h"
+#include "esp_types.h"
+
 #include <cstdint>
 
 // MACROS
