@@ -8,7 +8,7 @@
 
 #include "esp_err.h"
 #include "driver/i2c.h"
-#include "rom/ets_sys.h"
+#include "esp32/rom/ets_sys.h"
 
 #include <algorithm>
 #include <cstring>

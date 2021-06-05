@@ -39,7 +39,7 @@ private:
     int _retryCount;
     EventGroupHandle_t _wifiEvents;
     bool _isConnected;
-    esp_ip4_addr_t _ipAddress;
+    uint32_t _ipAddress;
 };
 
 F_END_NAMESPACE

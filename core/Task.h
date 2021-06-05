@@ -35,7 +35,7 @@ public:
     static uint32_t count();
     
     /// Creates and runs a new task.
-    Task(const char* pName = "", core_t core = CORE_ANY, uint32_t stackSize = 8192);
+    Task(const char* pName = "", core_t core = CORE_ANY, uint32_t priority = tskIDLE_PRIORITY, uint32_t stackSize = 16384);
     /// Virtual destructor. Stops and deletes the task.
     virtual ~Task();
 

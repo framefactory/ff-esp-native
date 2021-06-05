@@ -29,9 +29,8 @@ uint32_t Task::count()
     return uxTaskGetNumberOfTasks();
 }
 
-Task::Task(const char* pName, core_t core, uint32_t stackSize)
+Task::Task(const char* pName, core_t core, uint32_t priority, uint32_t stackSize)
 {
-    UBaseType_t priority = tskIDLE_PRIORITY;
     BaseType_t affinity = core < 0 || core > 1 ? tskNO_AFFINITY : core;
 
     BaseType_t result = xTaskCreatePinnedToCore(

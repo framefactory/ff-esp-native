@@ -35,7 +35,7 @@ bool WebServer::start(uint16_t port)
     config.server_port = port;
 
     if (httpd_start(&_serverHandle, &config) == ESP_OK) {
-        ESP_LOGI("Server listening on port %d", port);
+        ESP_LOGI(TAG, "Server listening on port %d", port);
         _isRunning = true;
     }
     else {
@@ -69,8 +69,11 @@ void WebServer::addRoute(const char* pUri, httpd_method_t method, WebRouter* pRo
 esp_err_t WebServer::_requestHandler(httpd_req_t* pRequest)
 {
     WebRouter* pRouter = static_cast<WebRouter*>(pRequest->user_ctx);
+    esp_err_t result = ESP_OK;
 
     if (pRouter) {
-        pRouter->onRequest(pRequest);
+        result = pRouter->onRequest(pRequest) ? ESP_OK : ESP_FAIL;
     }
+
+    return result;
 }

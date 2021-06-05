@@ -69,7 +69,7 @@ bool WiFiClient::connect(const char* pSSID, const char* pPassword, uint32_t maxR
     EventBits_t result = xEventGroupWaitBits(_wifiEvents, eventFlags_t::All, pdFALSE, pdFALSE, portMAX_DELAY);
 
     if (result & eventFlags_t::Connected) {
-        ESP_LOGI(TAG, "Connected to: %s, IP: " IPSTR, pSSID, _ipAddress);
+        //ESP_LOGI(TAG, "Connected to: %s, IP: " IPSTR, pSSID, _ipAddress);
         _isConnected = true;
     }
     else if (result & eventFlags_t::Failed) {
@@ -121,7 +121,7 @@ void WiFiClient::_onEvent(esp_event_base_t eventBase, int32_t eventId, void* pEv
     }
     else if (eventBase == IP_EVENT && eventId == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t* pIpEvent = static_cast<ip_event_got_ip_t*>(pEvent);
-        _ipAddress = pIpEvent->ip_info.ip;
+        _ipAddress = pIpEvent->ip_info.ip.addr;
         xEventGroupSetBits(_wifiEvents, eventFlags_t::Connected);
     }
 }
