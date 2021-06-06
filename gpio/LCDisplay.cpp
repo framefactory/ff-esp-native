@@ -35,7 +35,7 @@ bool LCDisplayUART::connect()
 
     ESP_ERROR_CHECK(uart_param_config(_uart, &uart_config));
     ESP_ERROR_CHECK(uart_set_pin(_uart, _pin, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
-    ESP_ERROR_CHECK(uart_driver_install(_uart,  256, 0, 0, nullptr, 0));
+    ESP_ERROR_CHECK(uart_driver_install(_uart,  256, 512, 0, nullptr, 0));
 
     return true;
 }

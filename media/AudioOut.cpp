@@ -1,6 +1,6 @@
 /**
  * ESP/Native Library
- * Copyright 2020 Frame Factory GmbH, Ralph Wiedemeier
+ * Copyright 2021 Frame Factory GmbH, Ralph Wiedemeier
  * License: MIT
  */
 
