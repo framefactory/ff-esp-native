@@ -10,7 +10,7 @@
 #include "../library.h"
 #include "../gpio/DigitalOutput.h"
 
-#include "esp32/rom/ets_sys.h"
+#include "rom/ets_sys.h"
 
 F_BEGIN_NAMESPACE
 
