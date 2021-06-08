@@ -58,8 +58,8 @@ bool WiFiClient::connect(const char* pSSID, const char* pPassword, uint32_t maxR
     config.sta.pmf_cfg.capable = true;
     config.sta.pmf_cfg.required = false;
 
-    strncpy((char*)config.sta.ssid, pSSID, sizeof(config.sta.ssid));
-    strncpy((char*)config.sta.password, pPassword, sizeof(config.sta.password));
+    strncpy((char*)config.sta.ssid, pSSID, sizeof(config.sta.ssid) - 1);
+    strncpy((char*)config.sta.password, pPassword, sizeof(config.sta.password) - 1);
 
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &config));

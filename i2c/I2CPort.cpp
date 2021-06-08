@@ -8,7 +8,7 @@
 
 #include "esp_err.h"
 #include "driver/i2c.h"
-#include "rom/ets_sys.h"
+#include "esp32/rom/ets_sys.h"
 
 
 F_USE_NAMESPACE
@@ -28,12 +28,11 @@ bool I2CPort::open(int sdaPin, int sclPin, int i2cPort /* = 0 */)
     i2c_config_t config {
         .mode = I2C_MODE_MASTER,
         .sda_io_num = (gpio_num_t)sdaPin,
-        .sda_pullup_en = pullup,
         .scl_io_num = (gpio_num_t)sclPin,
-        .scl_pullup_en = pullup
+        .sda_pullup_en = pullup,
+        .scl_pullup_en = pullup,
+        .master = { .clk_speed = _clockSpeed }
     };
-
-    config.master.clk_speed = _clockSpeed;
 
     esp_err_t err = i2c_param_config(port, &config);
     if (err != ESP_OK) {

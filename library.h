@@ -11,8 +11,6 @@
 #include "esp_log.h"
 #include "esp_types.h"
 
-#include <cstdint>
-
 // MACROS
 #define F_BEGIN_NAMESPACE namespace ff {
 #define F_END_NAMESPACE }
